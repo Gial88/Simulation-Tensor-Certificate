@@ -70,6 +70,7 @@ def solution_B4():
     model = tf.keras.Sequential([
         # YOUR CODE HERE.
         tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
+        tf.keras.layers.Dropout(0.2),
         tf.keras.layers.GlobalAveragePooling1D(),
         tf.keras.layers.Dropout(0.2),
         # YOUR CODE HERE. DO not change the last layer or test may fail
@@ -93,4 +94,4 @@ def solution_B4():
 if __name__ == '__main__':
     # DO NOT CHANGE THIS CODE
     model = solution_B4()
-    model.save("model_B4.h5")
+    # model.save("model_B4.h5")

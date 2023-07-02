@@ -13,32 +13,11 @@
 
 import tensorflow as tf
 
-# =====================================================================================
-# PROBLEM A2
-#
-# Build a Neural Network Model for Horse or Human Dataset.
-# The test will expect it to classify binary classes.
-# Your input layer should accept 150x150 with 3 bytes color as the input shape.
-# Don't use lambda layers in your model.
-#
-# The dataset used in this problem is created by Laurence Moroney (laurencemoroney.com).
-#
-# Desired accuracy and validation_accuracy > 83%
-# ======================================================================================
-
-import urllib.request
-import zipfile
-import tensorflow as tf
-import os
-from keras_preprocessing.image import ImageDataGenerator
-from tensorflow.keras.optimizers import RMSprop
-
-
 class myCallback(tf.keras.callbacks.Callback):
     # Define the correct function signature for on_epoch_end
     def on_epoch_end(self, epoch, logs={}):
-        if logs.get('val_accuracy') is not None and logs.get('val_accuracy') > 0.85:
-            print("\nReached 85 % Val Accuracy so cancelling training!")
+        if logs.get('val_accuracy') is not None and logs.get('val_accuracy') > 0.90:
+            print("\nReached 90 % Val Accuracy so cancelling training!")
 
             # Stop training once the above condition is met
             self.model.stop_training = True
@@ -59,8 +38,6 @@ def solution_B2():
         tf.keras.layers.MaxPooling2D(2, 2),
         tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
         tf.keras.layers.MaxPooling2D(2, 2),
-        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-        tf.keras.layers.MaxPooling2D(2, 2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(256, activation='relu'),
         tf.keras.layers.Dense(10, activation='softmax')
@@ -73,7 +50,7 @@ def solution_B2():
                   metrics=['accuracy'])
     # TRAIN YOUR MODEL HERE
     model.fit(train_data, train_labels,
-              epochs=15,
+              epochs=50,
               validation_data=(test_data, test_labels),
               callbacks=[myCallback()])
     return model
