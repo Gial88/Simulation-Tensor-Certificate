@@ -20,8 +20,8 @@ import numpy as np
 class myCallback(tf.keras.callbacks.Callback):
     # Define the correct function signature for on_epoch_end
     def on_epoch_end(self, epoch, logs={}):
-        if logs.get('val_accuracy') is not None and logs.get('val_accuracy') > 0.92 and logs.get('accuracy') > 0.92:
-            print("\nReached 92 % Val Accuracy so cancelling training!")
+        if logs.get('accuracy') > 0.91 and logs.get('val_accuracy') > 0.91:
+            print("\nAkurasi Telah mencapai 91%")
 
             # Stop training once the above condition is met
             self.model.stop_training = True
@@ -43,36 +43,31 @@ def solution_B4():
     sentences = bbc['text']
     labels = bbc['category']
     # Using "shuffle=False"
-    
-    training_sentences, validation_sentences = train_test_split(sentences, train_size=training_portion, shuffle=False)#YOUR CODE HERE
+
+    training_sentences, validation_sentences = train_test_split(sentences, train_size=training_portion, shuffle=False)
     training_labels, validation_labels = train_test_split(labels, train_size=training_portion, shuffle=False)#YOUR CODE HERE
     # Fit your tokenizer with training data
     tokenizer = Tokenizer(num_words=vocab_size, oov_token=oov_tok)
     tokenizer.fit_on_texts(training_sentences)
 
-    word_index = tokenizer.word_index
-
     training_sequences = tokenizer.texts_to_sequences(training_sentences)
-    training_padded = pad_sequences(training_sequences, maxlen=max_length, padding=trunc_type, truncating=trunc_type)
+    training_padded = pad_sequences(training_sequences, maxlen=max_length, padding=padding_type, truncating=trunc_type)
 
     validation_sequences = tokenizer.texts_to_sequences(validation_sentences)
-    validation_padded = pad_sequences(validation_sequences, maxlen=max_length, padding=trunc_type, truncating=trunc_type)
+    validation_padded = pad_sequences(validation_sequences, maxlen=max_length, padding=padding_type, truncating=trunc_type)
     # You can also use Tokenizer to encode your label.
     tokenizer_labels = Tokenizer()
-    tokenizer_labels.fit_on_texts(training_labels)
+    tokenizer_labels.fit_on_texts(labels)
 
-    training_labels = tokenizer_labels.texts_to_sequences(training_labels)
-    validation_labels = tokenizer_labels.texts_to_sequences(validation_labels)
-
-    training_labels = np.array(training_labels)
-    validation_labels = np.array(validation_labels)
+    training_labels = np.array(tokenizer_labels.texts_to_sequences(training_labels))
+    validation_labels = np.array(tokenizer_labels.texts_to_sequences(validation_labels))
 
     model = tf.keras.Sequential([
         # YOUR CODE HERE.
         tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
-        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dropout(0.4),
         tf.keras.layers.GlobalAveragePooling1D(),
-        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dropout(0.4),
         # YOUR CODE HERE. DO not change the last layer or test may fail
         tf.keras.layers.Dense(6, activation='softmax')
     ])
@@ -83,10 +78,9 @@ def solution_B4():
                   metrics=['accuracy'])
 
     model.fit(training_padded, training_labels,
-             epochs=50,
+             epochs=100,
              validation_data=(validation_padded, validation_labels),
              callbacks=[myCallback()])
-
     return model
 
     # The code below is to save your model as a .h5 file.
@@ -94,4 +88,4 @@ def solution_B4():
 if __name__ == '__main__':
     # DO NOT CHANGE THIS CODE
     model = solution_B4()
-    # model.save("model_B4.h5")
+    model.save("model_B4.h5")

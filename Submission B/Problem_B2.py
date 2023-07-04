@@ -16,8 +16,8 @@ import tensorflow as tf
 class myCallback(tf.keras.callbacks.Callback):
     # Define the correct function signature for on_epoch_end
     def on_epoch_end(self, epoch, logs={}):
-        if logs.get('val_accuracy') is not None and logs.get('val_accuracy') > 0.90:
-            print("\nReached 90 % Val Accuracy so cancelling training!")
+        if logs.get('accuracy') > 0.90 and logs.get('val_accuracy') > 0.90:
+            print("\nAkurasi Telah mencapai 90%")
 
             # Stop training once the above condition is met
             self.model.stop_training = True
@@ -28,18 +28,16 @@ def solution_B2():
 
     # NORMALIZE YOUR IMAGE HERE
     (train_data, train_labels), (test_data, test_labels) = fashion_mnist.load_data()
-    train_data = train_data.reshape(60000, 28, 28, 1)
     train_data = train_data / 255.0
-    test_data = test_data.reshape(10000, 28, 28, 1)
     test_data = test_data / 255.0
     # DEFINE YOUR MODEL HERE
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+        tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
         tf.keras.layers.MaxPooling2D(2, 2),
         tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
         tf.keras.layers.MaxPooling2D(2, 2),
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(512, activation='relu'),
         tf.keras.layers.Dense(10, activation='softmax')
     ])
     # End with 10 Neuron Dense, activated by softmax
